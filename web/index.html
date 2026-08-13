@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tibo Reset Monitor</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">PUBLIC X MONITOR</p>
+          <h1>Tibo Reset Monitor</h1>
+          <p class="subtitle">监测公开 X 消息，解析重置公告，并把旧金山时间转换为北京时间区间。</p>
+        </div>
+        <button id="notificationButton" class="secondary">开启浏览器提醒</button>
+      </header>
+
+      <section id="configNotice" class="notice hidden"></section>
+
+      <section class="status-grid" aria-label="运行状态">
+        <article class="status-card"><span>服务状态</span><strong id="state">—</strong></article>
+        <article class="status-card"><span>监测对象</span><strong id="target">—</strong></article>
+        <article class="status-card"><span>消息 / 报警</span><strong id="counts">—</strong></article>
+        <article class="status-card"><span>最近心跳</span><strong id="heartbeat">—</strong></article>
+        <article class="status-card"><span>邮件通知</span><strong id="emailStatus">—</strong></article>
+        <article class="status-card"><span>历史预测</span><strong id="predictionStatus">—</strong></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">LIVE FEED</p>
+            <h2>最近捕获的消息</h2>
+          </div>
+          <span id="connection" class="pill">连接中</span>
+        </div>
+        <div id="feed" class="feed"><div class="empty">等待消息……</div></div>
+      </section>
+
+      <section class="panel details">
+        <p class="eyebrow">CURRENT RULE</p>
+        <h2>当前监测规则</h2>
+        <code id="query">—</code>
+        <p class="muted">通知只处理公开帖子。页面中的原文使用纯文本显示，不执行帖子中的 HTML 或 Markdown。</p>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
