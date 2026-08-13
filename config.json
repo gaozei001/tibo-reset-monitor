@@ -1,0 +1,42 @@
+{
+  "tiboUsername": "thsottiaux",
+  "monitorMode": "author",
+  "port": 8787,
+  "sourceTimeZone": "America/Los_Angeles",
+  "targetTimeZone": "Asia/Shanghai",
+  "resetKeywords": [
+    "reset",
+    "restart",
+    "reboot",
+    "refresh",
+    "reset window",
+    "reset soon"
+  ],
+  "contextKeywords": [],
+  "fuzzyToleranceMinutes": 30,
+  "exactToleranceMinutes": 5,
+  "catchupOnStart": true,
+  "catchupMinutes": 10,
+  "maxReconnectSeconds": 60,
+  "history": {
+    "enabled": true,
+    "sourceUrl": "https://codex-reset.com/api/timeline",
+    "refreshMinutes": 15
+  },
+  "notification": {
+    "consoleBeep": true,
+    "webhookUrl": "",
+    "webhookHeaders": {},
+    "email": {
+      "enabled": true,
+      "onEveryMatch": true,
+      "host": "",
+      "port": 587,
+      "secure": false,
+      "user": "",
+      "from": "",
+      "to": "",
+      "timeoutMs": 20000
+    }
+  }
+}
