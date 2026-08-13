@@ -37,6 +37,14 @@
       "from": "",
       "to": "",
       "timeoutMs": 20000
+    },
+    "qq": {
+      "enabled": true,
+      "onEveryMatch": true,
+      "apiBase": "http://127.0.0.1:3000",
+      "targetType": "private",
+      "targetId": "",
+      "timeoutMs": 10000
     }
   }
 }

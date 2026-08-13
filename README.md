@@ -26,8 +26,9 @@
 - 本地 SQLite 记录；
 - 浏览器面板和 SSE 实时更新；
 - SMTP 邮件通知、UTF-8 邮件正文和重复消息去重；
+- OneBot v11 / NapCat QQ 通知、目标消息去重和失败状态记录；
 - 公开历史时间线的历史窗口预测；
-- 12 个自动化测试全部通过；
+- 14 个自动化测试全部通过；
 - 离线演示输出符合预期。
 
 尚未在你的 X Developer 账号和收件箱上做完整的真实在线验收，因为交付包中没有、也不应包含你的 Bearer Token、SMTP 密码和收件地址。配置后还需要验证：账号是否准确、X API 访问权限、实际帖子语言和真实邮件到达链路。
@@ -113,7 +114,39 @@ $env:EMAIL_ON_EVERY_MATCH = 'true'
 
 邮箱服务商若提供“应用专用密码”，应优先使用它，不要把主账户密码写入项目。当前交付包没有你的真实 SMTP 配置，所以未宣称已经向你的邮箱投递；本地测试使用假 SMTP 服务验证了握手、中文正文、主题和去重逻辑。面板的“邮件通知”状态会显示“待 SMTP / 已配置”。
 
-## 4. 先跑离线演示
+## 4. 配置 QQ 机器人通知
+
+程序支持 OneBot v11 HTTP API，适配 NapCat、go-cqhttp、LLOneBot 等兼容实现。你电脑上的 NapCat 配置已经确认使用本机接口 `http://127.0.0.1:3000`；项目不会把机器人 Token 或接收目标写进公开配置。
+
+如果是私聊给你的 QQ 号：
+
+```powershell
+$env:QQ_BOT_ENABLED = 'true'
+$env:ONEBOT_API_BASE = 'http://127.0.0.1:3000'
+$env:ONEBOT_TARGET_TYPE = 'private'
+$env:ONEBOT_TARGET_ID = '你的 QQ 号'
+# 如果 NapCat 配置了 Token，再设置这一项；当前本机配置为空
+# $env:ONEBOT_ACCESS_TOKEN = '你的 OneBot Token'
+```
+
+如果是发送到 QQ 群，把目标类型和目标 ID 改为：
+
+```powershell
+$env:ONEBOT_TARGET_TYPE = 'group'
+$env:ONEBOT_TARGET_ID = '你的 QQ 群号'
+```
+
+也支持同义环境变量 `QQ_BOT_URL`、`QQ_BOT_TOKEN`、`QQ_TARGET_TYPE` 和 `QQ_TARGET_ID`。程序只会向配置的目标发送相关 reset 消息；相同帖子、编辑版本和断线补漏会按帖子根 ID 去重。面板中的“QQ 通知”状态会显示“待 OneBot / 已配置”。
+
+当前本机的 NapCat HTTP 服务未运行，因此还需要先启动 QQ/NapCat，再启动本程序。可先用 NapCat 自带方式确认 `127.0.0.1:3000` 已监听；随后运行：
+
+```powershell
+.\run.ps1
+```
+
+机器人连通性测试由自动化测试中的本地假 OneBot 服务覆盖；真实 QQ 投递需要在 NapCat 登录并且目标 QQ/群号正确后单独验证。
+
+## 5. 先跑离线演示
 
 没有 Token 时可以先运行：
 
@@ -135,7 +168,7 @@ npm run demo
 
 演示会展示旧金山时间、北京时间、是否报警、估算窗口和判断依据。
 
-## 5. 运行测试
+## 6. 运行测试
 
 ```powershell
 npm test
@@ -151,7 +184,7 @@ npm test
 - `from:thsottiaux` 规则和转发排除；
 - 帖子显示的两个时区。
 
-另外，测试会启动本地假 SMTP 服务，确认相关消息会发邮件且同一帖子只发一次；历史预测测试会确认历史高峰窗口能从旧金山时间转换到北京时间。
+另外，测试会启动本地假 SMTP 和假 OneBot 服务，确认相关消息会发邮件/QQ 且同一帖子只发一次；历史预测测试会确认历史高峰窗口能从旧金山时间转换到北京时间。
 
 ## 估算规则
 
@@ -281,4 +314,5 @@ X Developer 账号的具体权限、计费和速率限制由 X 当前控制台�
 - 图片中的文字尚未接 OCR；
 - 没有时间的“soon / later”只能触发无区间提醒；
 - 真实在线捕获、X 权限、Webhook 到达和手机端呈现，需要在配置 Token 后单独验收；
+- QQ/NapCat 需要保持登录和 HTTP 服务运行；本程序不会替你登录 QQ 或绕过安全验证；
 - 程序目前只做检测和估算，不会自动执行任何外部重置动作。
