@@ -6,6 +6,7 @@ import { MANAGED_RULE_TAG, XClient } from "./x-client.mjs";
 import { fetchHistory } from "./history.mjs";
 import { predictResetWindow } from "./predictor.mjs";
 import { emailConfigured, renderAlertEmail, sendEmail } from "./email.mjs";
+import { qqConfigured, renderQQMessage, sendQQMessage } from "./qq.mjs";
 
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -40,6 +41,11 @@ export class Monitor extends EventEmitter {
       emailConfigured: emailConfigured(config),
       lastEmailAt: null,
       lastEmailError: null,
+      qqEnabled: config.notification?.qq?.enabled !== false,
+      qqOnEveryMatch: config.notification?.qq?.onEveryMatch !== false,
+      qqConfigured: qqConfigured(config),
+      lastQqAt: null,
+      lastQqError: null,
       historyReady: false,
       historyCount: 0,
       historySourceUrl: config.history?.sourceUrl || null,
@@ -227,7 +233,9 @@ export class Monitor extends EventEmitter {
       recovery: payload?.meta?.recovery || null,
       relevantMatch,
       emailSent: false,
-      emailError: null
+      emailError: null,
+      qqSent: false,
+      qqError: null
     };
 
     this.emit("post", record);
@@ -250,6 +258,23 @@ export class Monitor extends EventEmitter {
         record.emailError = error.message;
         this.statusState.lastEmailError = error.message;
       }
+      }
+    }
+    if (relevantMatch && this.statusState.qqOnEveryMatch && this.statusState.qqConfigured) {
+      const notificationKey = `${alertKey}:qq`;
+      if (this.store.hasNotification(notificationKey)) {
+        record.qqSent = true;
+      } else {
+        try {
+          await sendQQMessage(this.config, renderQQMessage(record));
+          const inserted = this.store.insertNotification(notificationKey, post.id, "qq", record, receivedAt);
+          record.qqSent = inserted;
+          if (inserted) this.statusState.lastQqAt = receivedAt.toISOString();
+          this.statusState.lastQqError = null;
+        } catch (error) {
+          record.qqError = error.message;
+          this.statusState.lastQqError = error.message;
+        }
       }
     }
     if (analysis.shouldAlert) {

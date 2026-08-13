@@ -33,7 +33,19 @@ function loadConfig() {
   if (process.env.EMAIL_FROM) email.from = process.env.EMAIL_FROM;
   if (process.env.EMAIL_TO) email.to = process.env.EMAIL_TO;
   if (process.env.EMAIL_ON_EVERY_MATCH) email.onEveryMatch = process.env.EMAIL_ON_EVERY_MATCH !== "false";
-  config.notification = { ...(config.notification || {}), email };
+
+  const qq = { ...(config.notification?.qq || {}) };
+  if (process.env.QQ_BOT_ENABLED) qq.enabled = process.env.QQ_BOT_ENABLED !== "false";
+  if (process.env.QQ_ON_EVERY_MATCH) qq.onEveryMatch = process.env.QQ_ON_EVERY_MATCH !== "false";
+  if (process.env.ONEBOT_API_BASE) qq.apiBase = process.env.ONEBOT_API_BASE;
+  if (process.env.QQ_BOT_URL) qq.apiBase = process.env.QQ_BOT_URL;
+  if (process.env.ONEBOT_ACCESS_TOKEN) qq.accessToken = process.env.ONEBOT_ACCESS_TOKEN;
+  if (process.env.QQ_BOT_TOKEN) qq.accessToken = process.env.QQ_BOT_TOKEN;
+  if (process.env.ONEBOT_TARGET_TYPE) qq.targetType = process.env.ONEBOT_TARGET_TYPE;
+  if (process.env.QQ_TARGET_TYPE) qq.targetType = process.env.QQ_TARGET_TYPE;
+  if (process.env.ONEBOT_TARGET_ID) qq.targetId = process.env.ONEBOT_TARGET_ID;
+  if (process.env.QQ_TARGET_ID) qq.targetId = process.env.QQ_TARGET_ID;
+  config.notification = { ...(config.notification || {}), email, qq };
 
   const defaults = {
     tiboUsername: "thsottiaux",
@@ -53,7 +65,8 @@ function loadConfig() {
       consoleBeep: true,
       webhookUrl: "",
       webhookHeaders: {},
-      email: { enabled: true, onEveryMatch: true, host: "", port: 587, secure: false, user: "", password: "", from: "", to: "", timeoutMs: 20000 }
+      email: { enabled: true, onEveryMatch: true, host: "", port: 587, secure: false, user: "", password: "", from: "", to: "", timeoutMs: 20000 },
+      qq: { enabled: true, onEveryMatch: true, apiBase: "", accessToken: "", targetType: "private", targetId: "", timeoutMs: 10000 }
     }
   };
   return {
@@ -63,7 +76,8 @@ function loadConfig() {
     notification: {
       ...defaults.notification,
       ...(config.notification || {}),
-      email: { ...defaults.notification.email, ...(config.notification?.email || {}) }
+      email: { ...defaults.notification.email, ...(config.notification?.email || {}) },
+      qq: { ...defaults.notification.qq, ...(config.notification?.qq || {}) }
     }
   };
 }
@@ -78,6 +92,7 @@ server.listen(config.port, "127.0.0.1", () => {
   console.log(`监测账号：@${config.tiboUsername}；模式：${config.monitorMode}`);
   console.log(token ? "X Bearer Token：已配置" : "X Bearer Token：未配置（当前仅提供配置状态面板）");
   console.log(config.notification?.email?.enabled === false ? "邮件通知：已关闭" : "邮件通知：等待 SMTP 环境变量");
+  console.log(config.notification?.qq?.enabled === false ? "QQ 通知：已关闭" : "QQ 通知：等待 OneBot 目标配置");
 });
 
 await monitor.start();
