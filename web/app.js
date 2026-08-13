@@ -120,6 +120,7 @@ function renderStatus(status) {
   $("#counts").textContent = `${status.counts?.posts ?? 0} / ${status.counts?.alerts ?? 0}`;
   $("#heartbeat").textContent = status.lastHeartbeatAt || "—";
   $("#emailStatus").textContent = status.emailEnabled === false ? "已关闭" : status.emailConfigured ? "已配置" : "待 SMTP";
+  $("#qqStatus").textContent = status.qqEnabled === false ? "已关闭" : status.qqConfigured ? "已配置" : "待 OneBot";
   $("#predictionStatus").textContent = status.predictionReady ? `${status.historyCount ?? 0} 条历史` : "不可用";
   $("#query").textContent = status.query || "尚未建立规则";
   const connection = $("#connection");
